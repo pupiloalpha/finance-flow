@@ -1,0 +1,6 @@
+{
+  "name": "FinanFlow - Controle Financeiro Pessoal",
+  "description": "Controle financeiro pessoal inteligente e automatizado com metodologia 50-30-20, planejamento orçamentário mensal e sincronização em nuvem.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

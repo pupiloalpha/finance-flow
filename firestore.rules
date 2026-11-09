@@ -1,0 +1,127 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny all access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Entity Validators
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['uid', 'currency']) &&
+             data.keys().hasOnly(['uid', 'displayName', 'email', 'currency', 'createdAt', 'updatedAt']) &&
+             data.uid == request.auth.uid &&
+             data.currency is string && data.currency.size() <= 10 &&
+             (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 100)) &&
+             (!('email' in data) || (data.email is string && data.email.size() <= 150));
+    }
+
+    function isValidMonthlyBudget(data) {
+      return data.keys().hasAll(['userId', 'month']) &&
+             data.keys().hasOnly(['userId', 'month', 'plannedExpenses', 'plannedIncomes', 'notes', 'updatedAt']) &&
+             data.userId == request.auth.uid &&
+             data.month is string && data.month.size() <= 7 &&
+             (!('plannedExpenses' in data) || (data.plannedExpenses is number && data.plannedExpenses >= 0)) &&
+             (!('plannedIncomes' in data) || (data.plannedIncomes is number && data.plannedIncomes >= 0)) &&
+             (!('notes' in data) || (data.notes is string && data.notes.size() <= 500));
+    }
+
+    function isValidCategoryBudget(data) {
+      return data.keys().hasAll(['userId', 'month', 'name', 'type', 'plannedAmount']) &&
+             data.keys().hasOnly(['userId', 'month', 'name', 'type', 'ruleGroup', 'plannedAmount', 'color', 'updatedAt']) &&
+             data.userId == request.auth.uid &&
+             data.month is string && data.month.size() <= 7 &&
+             data.name is string && data.name.size() > 0 && data.name.size() <= 60 &&
+             (data.type == 'despesa' || data.type == 'receita') &&
+             data.plannedAmount is number && data.plannedAmount >= 0 &&
+             (!('ruleGroup' in data) || (data.ruleGroup in ['necessidades', 'desejos', 'investimentos', 'receitas'])) &&
+             (!('color' in data) || (data.color is string && data.color.size() <= 20));
+    }
+
+    function isValidTransaction(data) {
+      return data.keys().hasAll(['userId', 'month', 'date', 'description', 'amount', 'type', 'category']) &&
+             data.keys().hasOnly(['userId', 'month', 'date', 'description', 'amount', 'type', 'category', 'ruleGroup', 'status', 'paymentMethod', 'notes', 'isRecurring', 'recurrenceInterval', 'installmentCurrent', 'installmentTotal', 'createdAt', 'updatedAt']) &&
+             data.userId == request.auth.uid &&
+             data.month is string && data.month.size() <= 7 &&
+             data.date is string && data.date.size() <= 10 &&
+             data.description is string && data.description.size() > 0 && data.description.size() <= 120 &&
+             data.amount is number && data.amount >= 0 &&
+             (data.type == 'despesa' || data.type == 'receita') &&
+             data.category is string && data.category.size() > 0 && data.category.size() <= 60 &&
+             (!('ruleGroup' in data) || (data.ruleGroup in ['necessidades', 'desejos', 'investimentos', 'receitas'])) &&
+             (!('status' in data) || (data.status in ['concluido', 'pendente'])) &&
+             (!('paymentMethod' in data) || (data.paymentMethod is string && data.paymentMethod.size() <= 50)) &&
+             (!('notes' in data) || (data.notes is string && data.notes.size() <= 250)) &&
+             (!('isRecurring' in data) || (data.isRecurring is bool)) &&
+             (!('recurrenceInterval' in data) || (data.recurrenceInterval is string && data.recurrenceInterval.size() <= 20)) &&
+             (!('installmentCurrent' in data) || (data.installmentCurrent is number)) &&
+             (!('installmentTotal' in data) || (data.installmentTotal is number));
+    }
+
+    // Rules for User Profile
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming());
+      allow update: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming()) &&
+                       incoming().uid == existing().uid &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'email', 'currency', 'updatedAt']);
+      allow delete: if isOwner(userId) && isValidId(userId);
+
+      // Monthly Budgets
+      match /budgets/{monthId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(monthId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(monthId) && isValidMonthlyBudget(incoming());
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(monthId) && isValidMonthlyBudget(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['plannedExpenses', 'plannedIncomes', 'notes', 'updatedAt']);
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(monthId);
+
+        // Category Budgets under monthly budget
+        match /categories/{categoryId} {
+          allow get: if isOwner(userId) && isValidId(userId) && isValidId(monthId) && isValidId(categoryId);
+          allow list: if isOwner(userId);
+          allow create: if isOwner(userId) && isValidId(userId) && isValidId(monthId) && isValidId(categoryId) && isValidCategoryBudget(incoming());
+          allow update: if isOwner(userId) && isValidId(userId) && isValidId(monthId) && isValidId(categoryId) && isValidCategoryBudget(incoming()) &&
+                           incoming().userId == existing().userId &&
+                           incoming().diff(existing()).affectedKeys().hasOnly(['name', 'type', 'ruleGroup', 'plannedAmount', 'color', 'updatedAt']);
+          allow delete: if isOwner(userId) && isValidId(userId) && isValidId(monthId) && isValidId(categoryId);
+        }
+      }
+
+      // Transactions
+      match /transactions/{transactionId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(transactionId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(transactionId) && isValidTransaction(incoming());
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(transactionId) && isValidTransaction(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['month', 'date', 'description', 'amount', 'type', 'category', 'ruleGroup', 'status', 'paymentMethod', 'notes', 'isRecurring', 'recurrenceInterval', 'installmentCurrent', 'installmentTotal', 'updatedAt']);
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(transactionId);
+      }
+    }
+  }
+}
