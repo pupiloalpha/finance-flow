@@ -217,26 +217,47 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     try {
       const budgetRef = doc(db, 'users', uid, 'budgets', month);
       await setDoc(budgetRef, {
-        ...INITIAL_MONTHLY_BUDGET,
         userId: uid,
         month,
+        plannedExpenses: INITIAL_MONTHLY_BUDGET.plannedExpenses,
+        plannedIncomes: INITIAL_MONTHLY_BUDGET.plannedIncomes,
+        notes: INITIAL_MONTHLY_BUDGET.notes || '',
+        updatedAt: new Date().toISOString(),
       });
 
       for (const cat of INITIAL_CATEGORIES) {
         const catRef = doc(db, 'users', uid, 'budgets', month, 'categories', cat.id);
         await setDoc(catRef, {
-          ...cat,
+          id: cat.id,
           userId: uid,
           month,
+          name: cat.name,
+          type: cat.type,
+          ruleGroup: cat.ruleGroup,
+          plannedAmount: cat.plannedAmount,
+          color: cat.color || '#10b981',
+          updatedAt: new Date().toISOString(),
         });
       }
 
       for (const tx of INITIAL_TRANSACTIONS) {
         const txRef = doc(db, 'users', uid, 'transactions', tx.id);
         await setDoc(txRef, {
-          ...tx,
+          id: tx.id,
           userId: uid,
           month,
+          date: tx.date,
+          description: tx.description,
+          amount: tx.amount,
+          type: tx.type,
+          category: tx.category,
+          ruleGroup: tx.ruleGroup,
+          status: tx.status,
+          paymentMethod: tx.paymentMethod || 'Outros',
+          notes: tx.notes || '',
+          isRecurring: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         });
       }
       setIsCloudSynced(true);

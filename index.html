@@ -19,6 +19,127 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+      // Clean mock for Vite HMR WebSocket in AI Studio iframe environment where HMR is disabled
+      (function() {
+        function MockWebSocket(url, protocols) {
+          var self = this;
+          self.url = url || '';
+          self.protocol = Array.isArray(protocols) ? (protocols[0] || '') : (protocols || '');
+          self.readyState = 1; // WebSocket.OPEN
+          self.binaryType = 'blob';
+          self.listeners = {};
+          self.onopen = null;
+          self.onmessage = null;
+          self.onerror = null;
+          self.onclose = null;
+
+          // Dispatch open event cleanly so Vite client marks the socket as opened
+          setTimeout(function() {
+            if (self.readyState === 1) {
+              var evt = { type: 'open', target: self, currentTarget: self };
+              if (typeof self.onopen === 'function') {
+                try { self.onopen(evt); } catch (e) {}
+              }
+              if (self.listeners && self.listeners['open']) {
+                self.listeners['open'].slice().forEach(function(fn) {
+                  try { fn(evt); } catch (e) {}
+                });
+              }
+            }
+          }, 10);
+
+          return self;
+        }
+
+        MockWebSocket.prototype.OPEN = 1;
+        MockWebSocket.prototype.CONNECTING = 0;
+        MockWebSocket.prototype.CLOSING = 2;
+        MockWebSocket.prototype.CLOSED = 3;
+        MockWebSocket.OPEN = 1;
+        MockWebSocket.CONNECTING = 0;
+        MockWebSocket.CLOSING = 2;
+        MockWebSocket.CLOSED = 3;
+
+        MockWebSocket.prototype.send = function() {};
+        MockWebSocket.prototype.close = function(code, reason) {
+          var self = this;
+          self.readyState = 3; // CLOSED
+          var evt = { type: 'close', wasClean: true, code: code || 1000, reason: reason || '', target: self };
+          if (typeof self.onclose === 'function') {
+            try { self.onclose(evt); } catch (e) {}
+          }
+          if (self.listeners && self.listeners['close']) {
+            self.listeners['close'].slice().forEach(function(fn) {
+              try { fn(evt); } catch (e) {}
+            });
+          }
+        };
+
+        MockWebSocket.prototype.addEventListener = function(type, listener) {
+          if (!this.listeners) this.listeners = {};
+          if (!this.listeners[type]) this.listeners[type] = [];
+          this.listeners[type].push(listener);
+
+          if (type === 'open' && this.readyState === 1) {
+            var self = this;
+            setTimeout(function() {
+              try { listener({ type: 'open', target: self, currentTarget: self }); } catch (e) {}
+            }, 10);
+          }
+        };
+
+        MockWebSocket.prototype.removeEventListener = function(type, listener) {
+          if (!this.listeners || !this.listeners[type]) return;
+          this.listeners[type] = this.listeners[type].filter(function(l) { return l !== listener; });
+        };
+
+        MockWebSocket.prototype.dispatchEvent = function(evt) {
+          if (!evt || !evt.type) return true;
+          var type = evt.type;
+          if (typeof this['on' + type] === 'function') {
+            try { this['on' + type](evt); } catch (e) {}
+          }
+          if (this.listeners && this.listeners[type]) {
+            this.listeners[type].slice().forEach(function(fn) {
+              try { fn(evt); } catch (e) {}
+            });
+          }
+          return true;
+        };
+
+        window.WebSocket = MockWebSocket;
+
+        // Suppress any console.error logs related to Vite HMR WebSockets
+        var origConsoleError = console.error;
+        console.error = function() {
+          var args = Array.prototype.slice.call(arguments);
+          var str = args.map(function(a) {
+            return String(a && a.message ? a.message : (a && a.stack ? a.stack : a));
+          }).join(' ');
+          if (str.indexOf('WebSocket') !== -1 || str.indexOf('[vite]') !== -1) {
+            return;
+          }
+          return origConsoleError.apply(console, args);
+        };
+
+        window.addEventListener('error', function (e) {
+          var msg = e && (e.message || (e.error && e.error.message)) ? String(e.message || e.error.message) : '';
+          if (msg.indexOf('WebSocket') !== -1 || msg.indexOf('ws://') !== -1 || msg.indexOf('wss://') !== -1) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+          }
+        }, true);
+
+        window.addEventListener('unhandledrejection', function (e) {
+          var reason = e && e.reason ? String(e.reason && e.reason.message ? e.reason.message : e.reason) : '';
+          if (reason.indexOf('WebSocket') !== -1 || reason.indexOf('ws://') !== -1 || reason.indexOf('wss://') !== -1) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+          }
+        }, true);
+      })();
+    </script>
   </head>
   <body class="bg-slate-950 text-slate-100 min-h-screen antialiased selection:bg-emerald-500 selection:text-white">
     <div id="root"></div>

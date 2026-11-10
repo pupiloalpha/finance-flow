@@ -18,7 +18,7 @@ service cloud.firestore {
     }
 
     function isValidId(id) {
-      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_-]+$');
     }
 
     function incoming() {
@@ -51,19 +51,20 @@ service cloud.firestore {
 
     function isValidCategoryBudget(data) {
       return data.keys().hasAll(['userId', 'month', 'name', 'type', 'plannedAmount']) &&
-             data.keys().hasOnly(['userId', 'month', 'name', 'type', 'ruleGroup', 'plannedAmount', 'color', 'updatedAt']) &&
+             data.keys().hasOnly(['id', 'userId', 'month', 'name', 'type', 'ruleGroup', 'plannedAmount', 'color', 'updatedAt']) &&
              data.userId == request.auth.uid &&
              data.month is string && data.month.size() <= 7 &&
              data.name is string && data.name.size() > 0 && data.name.size() <= 60 &&
              (data.type == 'despesa' || data.type == 'receita') &&
              data.plannedAmount is number && data.plannedAmount >= 0 &&
+             (!('id' in data) || (data.id is string && data.id.size() <= 128)) &&
              (!('ruleGroup' in data) || (data.ruleGroup in ['necessidades', 'desejos', 'investimentos', 'receitas'])) &&
              (!('color' in data) || (data.color is string && data.color.size() <= 20));
     }
 
     function isValidTransaction(data) {
       return data.keys().hasAll(['userId', 'month', 'date', 'description', 'amount', 'type', 'category']) &&
-             data.keys().hasOnly(['userId', 'month', 'date', 'description', 'amount', 'type', 'category', 'ruleGroup', 'status', 'paymentMethod', 'notes', 'isRecurring', 'recurrenceInterval', 'installmentCurrent', 'installmentTotal', 'createdAt', 'updatedAt']) &&
+             data.keys().hasOnly(['id', 'userId', 'month', 'date', 'description', 'amount', 'type', 'category', 'ruleGroup', 'status', 'paymentMethod', 'notes', 'isRecurring', 'recurrenceInterval', 'installmentCurrent', 'installmentTotal', 'createdAt', 'updatedAt']) &&
              data.userId == request.auth.uid &&
              data.month is string && data.month.size() <= 7 &&
              data.date is string && data.date.size() <= 10 &&
@@ -71,6 +72,7 @@ service cloud.firestore {
              data.amount is number && data.amount >= 0 &&
              (data.type == 'despesa' || data.type == 'receita') &&
              data.category is string && data.category.size() > 0 && data.category.size() <= 60 &&
+             (!('id' in data) || (data.id is string && data.id.size() <= 128)) &&
              (!('ruleGroup' in data) || (data.ruleGroup in ['necessidades', 'desejos', 'investimentos', 'receitas'])) &&
              (!('status' in data) || (data.status in ['concluido', 'pendente'])) &&
              (!('paymentMethod' in data) || (data.paymentMethod is string && data.paymentMethod.size() <= 50)) &&
@@ -107,7 +109,7 @@ service cloud.firestore {
           allow create: if isOwner(userId) && isValidId(userId) && isValidId(monthId) && isValidId(categoryId) && isValidCategoryBudget(incoming());
           allow update: if isOwner(userId) && isValidId(userId) && isValidId(monthId) && isValidId(categoryId) && isValidCategoryBudget(incoming()) &&
                            incoming().userId == existing().userId &&
-                           incoming().diff(existing()).affectedKeys().hasOnly(['name', 'type', 'ruleGroup', 'plannedAmount', 'color', 'updatedAt']);
+                           incoming().diff(existing()).affectedKeys().hasOnly(['id', 'name', 'type', 'ruleGroup', 'plannedAmount', 'color', 'updatedAt']);
           allow delete: if isOwner(userId) && isValidId(userId) && isValidId(monthId) && isValidId(categoryId);
         }
       }
@@ -119,7 +121,7 @@ service cloud.firestore {
         allow create: if isOwner(userId) && isValidId(userId) && isValidId(transactionId) && isValidTransaction(incoming());
         allow update: if isOwner(userId) && isValidId(userId) && isValidId(transactionId) && isValidTransaction(incoming()) &&
                          incoming().userId == existing().userId &&
-                         incoming().diff(existing()).affectedKeys().hasOnly(['month', 'date', 'description', 'amount', 'type', 'category', 'ruleGroup', 'status', 'paymentMethod', 'notes', 'isRecurring', 'recurrenceInterval', 'installmentCurrent', 'installmentTotal', 'updatedAt']);
+                         incoming().diff(existing()).affectedKeys().hasOnly(['id', 'month', 'date', 'description', 'amount', 'type', 'category', 'ruleGroup', 'status', 'paymentMethod', 'notes', 'isRecurring', 'recurrenceInterval', 'installmentCurrent', 'installmentTotal', 'updatedAt']);
         allow delete: if isOwner(userId) && isValidId(userId) && isValidId(transactionId);
       }
     }

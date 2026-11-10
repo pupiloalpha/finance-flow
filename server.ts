@@ -1,8 +1,11 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
+import http from 'http';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI, Type } from '@google/genai';
+
+process.env.DISABLE_HMR = 'true';
 
 dotenv.config();
 
@@ -10,10 +13,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+const httpServer = http.createServer(app);
 const PORT = process.env.PORT || 3000;
 const isProd = process.env.NODE_ENV === 'production';
 
-// Body parsers with generous limit for file uploads (PDFs, images, CSVs up to 20MB)
+// Body parsers with generous limit for file uploads (PDFs, images, CSVs up to 25MB)
 app.use(express.json({ limit: '25mb' }));
 app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
@@ -202,7 +206,6 @@ Extraia todas as transações encontradas com alta fidelidade.
     let contentsPayload: any;
 
     if (fileContentBase64 && mimeType) {
-      // Multimodal part (PDF or image)
       contentsPayload = {
         parts: [
           {
@@ -217,7 +220,6 @@ Extraia todas as transações encontradas com alta fidelidade.
         ],
       };
     } else {
-      // Text / CSV content
       contentsPayload = `${instruction}\nConteúdo do arquivo ${fileName}:\n${textContent || ''}`;
     }
 
@@ -269,7 +271,10 @@ async function startServer() {
   if (!isProd) {
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        hmr: false,
+      },
       appType: 'spa',
     });
     app.use(vite.middlewares);
@@ -280,7 +285,7 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, () => {
+  httpServer.listen(PORT, () => {
     console.log(`Server listening on http://localhost:${PORT}`);
   });
 }

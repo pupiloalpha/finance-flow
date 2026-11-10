@@ -33,13 +33,15 @@
       "description": "Planned budget per category for a month",
       "type": "object",
       "properties": {
+        "id": { "type": "string", "maxLength": 128 },
         "userId": { "type": "string", "maxLength": 128 },
         "month": { "type": "string", "maxLength": 7 },
         "name": { "type": "string", "maxLength": 60 },
         "type": { "type": "string", "enum": ["despesa", "receita"] },
         "ruleGroup": { "type": "string", "enum": ["necessidades", "desejos", "investimentos", "receitas"] },
         "plannedAmount": { "type": "number" },
-        "color": { "type": "string", "maxLength": 20 }
+        "color": { "type": "string", "maxLength": 20 },
+        "updatedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["userId", "month", "name", "type", "plannedAmount"]
     },
@@ -48,6 +50,7 @@
       "description": "Financial income or expense transaction record",
       "type": "object",
       "properties": {
+        "id": { "type": "string", "maxLength": 128 },
         "userId": { "type": "string", "maxLength": 128 },
         "month": { "type": "string", "maxLength": 7, "pattern": "^[0-9]{4}-[0-9]{2}$" },
         "date": { "type": "string", "maxLength": 10 },
