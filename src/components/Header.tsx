@@ -79,7 +79,7 @@ export const Header: React.FC<HeaderProps> = ({
               <div>
                 <div className="flex items-center gap-2">
                   <h1 className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white font-['Plus_Jakarta_Sans']">
-                    FinanFlow
+                    Minhas Contas
                   </h1>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400">

@@ -56,7 +56,7 @@ export const PWAInstallButton: React.FC = () => {
                 <br />
                 <span>2. Role a lista e selecione <strong>Adicionar à Tela de Início</strong>.</span>
                 <br />
-                <span>3. O FinanFlow funcionará em tela cheia como um app nativo, mesmo offline!</span>
+                <span>3. O Minhas Contas funcionará em tela cheia como um app nativo, mesmo offline!</span>
               </p>
               <button
                 onClick={() => setShowIOSGuide(false)}

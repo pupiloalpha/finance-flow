@@ -159,7 +159,7 @@ function Dashboard() {
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-500" />
-            <span>FinanFlow — Seus dados financeiros protegidos e criptografados</span>
+            <span>Minhas Contas — Seus dados financeiros protegidos e criptografados</span>
           </div>
           <p>© 2026 Controle Financeiro Pessoal • Integrado ao Firebase & Gemini AI</p>
         </div>

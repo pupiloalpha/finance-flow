@@ -14,8 +14,8 @@ export default defineConfig(() => {
         includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icon.svg'],
         manifest: {
           id: '/',
-          name: 'FinanFlow - Controle Financeiro Pessoal',
-          short_name: 'FinanFlow',
+          name: 'Minhas Contas - Controle Financeiro Pessoal',
+          short_name: 'Minhas Contas',
           description: 'Controle financeiro pessoal inteligente e automatizado com metodologia 50-30-20 e sincronização em nuvem.',
           theme_color: '#0f172a',
           background_color: '#020617',
