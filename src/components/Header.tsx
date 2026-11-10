@@ -83,9 +83,6 @@ export const Header: React.FC<HeaderProps> = ({
                   <h1 className="text-lg font-extrabold tracking-tight text-white font-['Plus_Jakarta_Sans']">
                     FinanFlow
                   </h1>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    Controle 50-30-20
-                  </span>
                 </div>
                 <p className="text-xs text-slate-400">
                   Painel Financeiro Automatizado
