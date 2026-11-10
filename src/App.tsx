@@ -172,6 +172,10 @@ function Dashboard() {
         editingTransaction={editingTransaction}
         initialCategory={initialCategory}
         initialType={initialType}
+        onSwitchToImport={() => {
+          setIsTransactionModalOpen(false);
+          setIsFileUploadOpen(true);
+        }}
       />
 
       <BudgetModal

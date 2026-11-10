@@ -15,6 +15,7 @@ import {
   Clock,
   Repeat,
   UploadCloud,
+  ClipboardPaste,
 } from 'lucide-react';
 
 interface TransactionListProps {
@@ -85,10 +86,10 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             <button
               onClick={onOpenFileUpload}
               className="flex items-center gap-2 rounded-xl border border-cyan-500/30 bg-cyan-50 dark:bg-cyan-950/40 hover:bg-cyan-100 dark:hover:bg-cyan-900/60 px-3.5 py-2 text-xs font-semibold text-cyan-700 dark:text-cyan-300 transition cursor-pointer shadow-xs active:scale-95"
-              title="Importar extratos bancários, faturas de cartão ou boletos (CSV, XLS, PDF)"
+              title="Copiar e colar dados tabulados do Excel/Google Sheets ou importar arquivos CSV e PDF"
             >
-              <UploadCloud className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
-              <span>Importar Extrato (CSV/PDF)</span>
+              <ClipboardPaste className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+              <span>Importar ou Colar Planilha</span>
             </button>
           )}
         </div>
@@ -187,8 +188,8 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                 onClick={onOpenFileUpload}
                 className="inline-flex items-center gap-1.5 text-xs text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 font-semibold cursor-pointer"
               >
-                <UploadCloud className="w-4 h-4" />
-                Importar arquivo
+                <ClipboardPaste className="w-4 h-4" />
+                Importar ou colar planilha
               </button>
             )}
           </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useFinance } from '../context/FinanceContext';
 import { RuleGroup, Transaction, TransactionStatus, TransactionType } from '../types';
-import { X, Check, Repeat, Calendar } from 'lucide-react';
+import { X, Check, Repeat, Calendar, ClipboardPaste } from 'lucide-react';
 
 interface TransactionModalProps {
   isOpen: boolean;
@@ -9,6 +9,7 @@ interface TransactionModalProps {
   editingTransaction?: Transaction | null;
   initialCategory?: string;
   initialType?: TransactionType;
+  onSwitchToImport?: () => void;
 }
 
 export const TransactionModal: React.FC<TransactionModalProps> = ({
@@ -17,6 +18,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
   editingTransaction,
   initialCategory,
   initialType = 'despesa',
+  onSwitchToImport,
 }) => {
   const { addTransaction, updateTransaction, categoryBudgets, selectedMonth } = useFinance();
 
@@ -149,6 +151,22 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {!editingTransaction && onSwitchToImport && (
+          <div className="mt-3 p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-xs text-cyan-800 dark:text-cyan-300 flex items-center justify-between gap-2">
+            <span className="flex items-center gap-1.5 text-[11px]">
+              <ClipboardPaste className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400 shrink-0" />
+              <span>Deseja inserir vários lançamentos copiados do Excel ou Sheets?</span>
+            </span>
+            <button
+              type="button"
+              onClick={onSwitchToImport}
+              className="text-[11px] font-bold text-cyan-700 dark:text-cyan-300 hover:underline shrink-0 cursor-pointer"
+            >
+              Colar tabela →
+            </button>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           
