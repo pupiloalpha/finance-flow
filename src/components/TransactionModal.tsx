@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useFinance } from '../context/FinanceContext';
 import { RuleGroup, Transaction, TransactionStatus, TransactionType } from '../types';
 import { X, Check, Repeat, Calendar, ClipboardPaste } from 'lucide-react';
+import { cleanAmount } from '../utils/tabularParser';
 
 interface TransactionModalProps {
   isOpen: boolean;
@@ -97,7 +98,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const numAmount = parseFloat(amount.replace(',', '.'));
+    const { amount: numAmount } = cleanAmount(amount);
     if (!description.trim() || isNaN(numAmount) || numAmount <= 0) {
       alert('Por favor informe uma descrição válida e um valor maior que zero.');
       return;

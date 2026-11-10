@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useFinance } from '../context/FinanceContext';
 import { formatCurrency } from './KPICards';
+import { cleanAmount } from '../utils/tabularParser';
 import { X, Check, Sliders, AlertCircle } from 'lucide-react';
 
 interface BudgetModalProps {
@@ -42,7 +43,7 @@ export const BudgetModal: React.FC<BudgetModalProps> = ({
   const handleSingleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!targetCategoryId) return;
-    const val = parseFloat(singleValue.replace(',', '.'));
+    const { amount: val } = cleanAmount(singleValue);
     if (!isNaN(val) && val >= 0) {
       await updateCategoryPlanned(targetCategoryId, val);
       onClose();

@@ -320,30 +320,75 @@ function cleanDate(str: string, defaultMonth: string): string {
 }
 
 /** Check if string contains currency or number */
-function isAmountString(str: string): boolean {
-  const cleaned = str.replace(/[R$\s]/g, '').trim();
-  // Matches 1.234,56 or 1234,56 or 1,234.56 or 1234.56 or -50,00
-  return /^-?\(?\d+(?:[.,]\d+)?\)?$/.test(cleaned) || /^-?\(?\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{1,2})?\)?$/.test(cleaned);
+export function isAmountString(str: string): boolean {
+  const cleaned = str.replace(/[R$\s()D\-+]/gi, '').trim();
+  if (!cleaned) return false;
+  // Matches 2.517, 2.517,00, 150,00, 150.00, 10.000, 2517
+  return (
+    /^\d+(?:[.,]\d+)?$/.test(cleaned) ||
+    /^\d{1,3}(?:\.\d{3})*(?:,\d{1,2})?$/.test(cleaned) ||
+    /^\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?$/.test(cleaned)
+  );
 }
 
 /** Parse numeric amount safely from brazilian or standard currency text */
-function cleanAmount(str: string): { amount: number; isNegative: boolean } {
+export function cleanAmount(str: string): { amount: number; isNegative: boolean } {
   let cleaned = str.trim();
   let isNegative = false;
 
-  if (cleaned.startsWith('-') || cleaned.endsWith('-') || (cleaned.startsWith('(') && cleaned.endsWith(')')) || / débito/i.test(cleaned) || / D$/i.test(cleaned)) {
+  if (
+    cleaned.startsWith('-') ||
+    cleaned.endsWith('-') ||
+    (cleaned.startsWith('(') && cleaned.endsWith(')')) ||
+    /débito|debito/i.test(cleaned) ||
+    /\s+D$/i.test(cleaned) ||
+    /-\s*R\$/i.test(cleaned)
+  ) {
     isNegative = true;
   }
 
   // Remove currency signs, parens, letters, spaces
   cleaned = cleaned.replace(/[R$\s()D\-+]/gi, '').trim();
 
-  // If format is 1.234,56 (dot thousands, comma decimal)
+  // If both dots and commas exist:
+  // e.g. 1.234,56 (BR format) or 1,234.56 (US format)
   if (cleaned.includes('.') && cleaned.includes(',')) {
-    cleaned = cleaned.replace(/\./g, '').replace(',', '.');
+    const lastDot = cleaned.lastIndexOf('.');
+    const lastComma = cleaned.lastIndexOf(',');
+    if (lastComma > lastDot) {
+      // BR format: 1.234,56 -> dots are thousands, comma is decimal
+      cleaned = cleaned.replace(/\./g, '').replace(',', '.');
+    } else {
+      // US format: 1,234.56 -> commas are thousands
+      cleaned = cleaned.replace(/,/g, '');
+    }
+  } else if (cleaned.includes('.')) {
+    // String contains only dot(s):
+    // e.g. 2.517 or 10.000 or 1.250.000 or 150.50
+    const dotMatches = cleaned.match(/\./g);
+    if (dotMatches && dotMatches.length > 1) {
+      // Multiple dots: e.g. 1.250.000 -> all thousands separators in pt-BR
+      cleaned = cleaned.replace(/\./g, '');
+    } else {
+      // Single dot: e.g. 2.517 vs 150.50
+      const parts = cleaned.split('.');
+      if (parts[1].length === 3) {
+        // Exactly 3 digits after dot (e.g. 2.517, 10.000, 1.500):
+        // In Brazilian Portuguese / currency, this is a thousands separator!
+        cleaned = cleaned.replace('.', '');
+      } else {
+        // 1 or 2 digits after dot, or >3 digits: keep as decimal point (e.g. 150.50)
+      }
+    }
   } else if (cleaned.includes(',')) {
-    // Format 1234,56
-    cleaned = cleaned.replace(',', '.');
+    // String contains only comma(s):
+    // e.g. 2517,00 or 389,50
+    const commaMatches = cleaned.match(/,/g);
+    if (commaMatches && commaMatches.length > 1) {
+      cleaned = cleaned.replace(/,/g, '');
+    } else {
+      cleaned = cleaned.replace(',', '.');
+    }
   }
 
   const num = parseFloat(cleaned);
