@@ -70,16 +70,16 @@ export const BudgetModal: React.FC<BudgetModalProps> = ({
   // Single category quick edit mode
   if (targetCategoryId && targetCategoryName) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-        <div className="w-full max-w-sm rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl text-slate-100">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
-              <Sliders className="w-4 h-4 text-emerald-400" />
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm p-4">
+        <div className="w-full max-w-sm rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xl text-slate-800 dark:text-slate-100 transition-colors">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Sliders className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               Editar Teto de {targetCategoryName}
             </h3>
             <button
               onClick={onClose}
-              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -87,7 +87,7 @@ export const BudgetModal: React.FC<BudgetModalProps> = ({
 
           <form onSubmit={handleSingleSubmit} className="mt-4 space-y-4">
             <div>
-              <label className="text-xs text-slate-400 block mb-1">
+              <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">
                 Novo valor planejado para o mês ({selectedMonth}):
               </label>
               <div className="relative">
@@ -100,7 +100,7 @@ export const BudgetModal: React.FC<BudgetModalProps> = ({
                   required
                   value={singleValue}
                   onChange={(e) => setSingleValue(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white font-['JetBrains_Mono'] text-base font-bold focus:outline-none focus:border-emerald-500"
+                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white font-['JetBrains_Mono'] text-base font-bold focus:outline-none focus:border-emerald-500"
                 />
               </div>
             </div>
@@ -109,13 +109,13 @@ export const BudgetModal: React.FC<BudgetModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                className="px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="px-4 py-1.5 rounded-xl bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-500 transition"
+                className="px-4 py-1.5 rounded-xl bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-500 transition cursor-pointer shadow-xs"
               >
                 Salvar Teto
               </button>
@@ -128,21 +128,21 @@ export const BudgetModal: React.FC<BudgetModalProps> = ({
 
   // Bulk edit mode
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="w-full max-w-2xl rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl text-slate-100 my-8">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
+      <div className="w-full max-w-2xl rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xl text-slate-800 dark:text-slate-100 my-8 transition-colors">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
           <div>
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <Sliders className="w-5 h-5 text-emerald-400" />
+            <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Sliders className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
               Planejamento de Metas & Tetos Orçamentários ({selectedMonth})
             </h3>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Defina os limites de gastos por categoria para automatizar os alertas ⚠️ e o cálculo 50-30-20.
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -151,7 +151,7 @@ export const BudgetModal: React.FC<BudgetModalProps> = ({
         <form onSubmit={handleBulkSubmit} className="mt-4 space-y-5">
           {/* Despesas list */}
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-rose-400 mb-2">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 mb-2">
               Tetos de Despesas
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -160,10 +160,10 @@ export const BudgetModal: React.FC<BudgetModalProps> = ({
                 .map((cat) => (
                   <div
                     key={cat.id}
-                    className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-2"
+                    className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2"
                   >
                     <div>
-                      <span className="text-xs font-semibold text-white block">
+                      <span className="text-xs font-semibold text-slate-800 dark:text-white block">
                         {cat.name}
                       </span>
                       <span className="text-[10px] text-slate-500 capitalize">
@@ -171,7 +171,7 @@ export const BudgetModal: React.FC<BudgetModalProps> = ({
                       </span>
                     </div>
                     <div className="w-28 relative">
-                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-500 font-['JetBrains_Mono']">
+                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400 dark:text-slate-500 font-['JetBrains_Mono']">
                         R$
                       </span>
                       <input
@@ -184,7 +184,7 @@ export const BudgetModal: React.FC<BudgetModalProps> = ({
                             [cat.id]: parseFloat(e.target.value) || 0,
                           })
                         }
-                        className="w-full pl-6 pr-2 py-1 text-right rounded-lg bg-slate-900 border border-slate-700 text-xs text-white font-['JetBrains_Mono'] font-bold focus:outline-none focus:border-emerald-500"
+                        className="w-full pl-6 pr-2 py-1 text-right rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white font-['JetBrains_Mono'] font-bold focus:outline-none focus:border-emerald-500"
                       />
                     </div>
                   </div>
@@ -194,7 +194,7 @@ export const BudgetModal: React.FC<BudgetModalProps> = ({
 
           {/* Receitas list */}
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-cyan-400 mb-2">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400 mb-2">
               Previsão de Receitas
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -203,13 +203,13 @@ export const BudgetModal: React.FC<BudgetModalProps> = ({
                 .map((cat) => (
                   <div
                     key={cat.id}
-                    className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-2"
+                    className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2"
                   >
-                    <span className="text-xs font-semibold text-white">
+                    <span className="text-xs font-semibold text-slate-800 dark:text-white">
                       {cat.name}
                     </span>
                     <div className="w-28 relative">
-                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-500 font-['JetBrains_Mono']">
+                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400 dark:text-slate-500 font-['JetBrains_Mono']">
                         R$
                       </span>
                       <input
@@ -222,7 +222,7 @@ export const BudgetModal: React.FC<BudgetModalProps> = ({
                             [cat.id]: parseFloat(e.target.value) || 0,
                           })
                         }
-                        className="w-full pl-6 pr-2 py-1 text-right rounded-lg bg-slate-900 border border-slate-700 text-xs text-white font-['JetBrains_Mono'] font-bold focus:outline-none focus:border-cyan-500"
+                        className="w-full pl-6 pr-2 py-1 text-right rounded-lg bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-xs text-slate-900 dark:text-white font-['JetBrains_Mono'] font-bold focus:outline-none focus:border-cyan-500"
                       />
                     </div>
                   </div>
@@ -231,17 +231,17 @@ export const BudgetModal: React.FC<BudgetModalProps> = ({
           </div>
 
           {/* Buttons */}
-          <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-500 shadow-md transition"
+              className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-500 shadow-md transition cursor-pointer"
             >
               <Check className="w-4 h-4" />
               <span>Salvar Metas Orçamentárias</span>

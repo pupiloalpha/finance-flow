@@ -129,22 +129,22 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
-      <div className="w-full max-w-lg rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl text-slate-100 my-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
+      <div className="w-full max-w-lg rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xl text-slate-800 dark:text-slate-100 my-8 transition-colors">
         
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
-          <h3 className="text-base font-bold text-white flex items-center gap-2">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+          <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
             {editingTransaction ? 'Editar Lançamento' : 'Novo Lançamento'}
             {isRecurring && (
-              <span className="text-[10px] font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span className="text-[10px] font-semibold bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
                 <Repeat className="w-3 h-3" /> Fixo / Recorrente
               </span>
             )}
           </h3>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -154,17 +154,17 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
           
           {/* Type Switcher */}
           <div>
-            <label className="text-xs font-semibold text-slate-300 block mb-1.5">
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
               Tipo de Operação
             </label>
-            <div className="grid grid-cols-2 gap-2 bg-slate-950 p-1 rounded-xl border border-slate-800">
+            <div className="grid grid-cols-2 gap-2 bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => handleTypeChange('despesa')}
-                className={`py-2 text-xs font-bold rounded-lg transition ${
+                className={`py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
                   type === 'despesa'
                     ? 'bg-rose-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
                 Despesa (Saída)
@@ -172,10 +172,10 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
               <button
                 type="button"
                 onClick={() => handleTypeChange('receita')}
-                className={`py-2 text-xs font-bold rounded-lg transition ${
+                className={`py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
                   type === 'receita'
                     ? 'bg-cyan-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-slate-200'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                 }`}
               >
                 Receita (Entrada)
@@ -186,7 +186,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
           {/* Amount & Date */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-semibold text-slate-300 block mb-1">
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                 Valor (R$) *
               </label>
               <div className="relative">
@@ -200,13 +200,13 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                   placeholder="0,00"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white font-['JetBrains_Mono'] text-sm font-bold focus:outline-none focus:border-emerald-500"
+                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white font-['JetBrains_Mono'] text-sm font-bold focus:outline-none focus:border-emerald-500"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-slate-300 block mb-1">
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                 Data do Lançamento *
               </label>
               <input
@@ -214,14 +214,14 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                 required
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs font-medium focus:outline-none focus:border-emerald-500"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-xs font-medium focus:outline-none focus:border-emerald-500"
               />
             </div>
           </div>
 
           {/* Description */}
           <div>
-            <label className="text-xs font-semibold text-slate-300 block mb-1">
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
               Descrição / Identificação *
             </label>
             <input
@@ -230,23 +230,23 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
               placeholder="Ex: Aluguel Residencial, Netflix, Salário Mensal, Internet..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+              className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-xs placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-emerald-500"
             />
           </div>
 
           {/* Category & 50-30-20 Rule */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-semibold text-slate-300 block mb-1">
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                 Categoria *
               </label>
               <select
                 value={category}
                 onChange={(e) => handleCategoryChange(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-emerald-500 cursor-pointer"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-emerald-500 cursor-pointer"
               >
                 {availableCategories.map((c) => (
-                  <option key={c} value={c}>
+                  <option key={c} value={c} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
                     {c}
                   </option>
                 ))}
@@ -255,41 +255,41 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
 
             {type === 'despesa' ? (
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                   Classificação (50-30-20)
                 </label>
                 <select
                   value={ruleGroup}
                   onChange={(e) => setRuleGroup(e.target.value as RuleGroup)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-emerald-500 cursor-pointer"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-emerald-500 cursor-pointer"
                 >
-                  <option value="necessidades">Necessidades (50%)</option>
-                  <option value="desejos">Desejos & Estilo (30%)</option>
-                  <option value="investimentos">Investimentos & Reserva (20%)</option>
+                  <option value="necessidades" className="bg-white dark:bg-slate-900">Necessidades (50%)</option>
+                  <option value="desejos" className="bg-white dark:bg-slate-900">Desejos & Estilo (30%)</option>
+                  <option value="investimentos" className="bg-white dark:bg-slate-900">Investimentos & Reserva (20%)</option>
                 </select>
               </div>
             ) : (
               <div>
-                <label className="text-xs font-semibold text-slate-300 block mb-1">
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                   Classificação
                 </label>
-                <div className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-400 text-xs">
+                <div className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-xs">
                   Receita / Entrada
                 </div>
               </div>
             )}
           </div>
 
-          {/* Recurrence & Fixed Option (REQUESTED BY USER) */}
-          <div className="rounded-xl border border-indigo-500/20 bg-indigo-950/20 p-3 space-y-3">
+          {/* Recurrence & Fixed Option */}
+          <div className="rounded-xl border border-indigo-200 dark:border-indigo-500/20 bg-indigo-50/70 dark:bg-indigo-950/20 p-3 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Repeat className="w-4 h-4 text-indigo-400" />
+                <Repeat className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                 <div>
-                  <span className="text-xs font-bold text-white block">
+                  <span className="text-xs font-bold text-slate-900 dark:text-white block">
                     Lançamento Fixo / Recorrente
                   </span>
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400">
                     Repete este lançamento em múltiplos meses (ex: aluguel, salário, assinaturas)
                   </span>
                 </div>
@@ -304,15 +304,15 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
             </div>
 
             {isRecurring && (
-              <div className="pt-2 border-t border-indigo-500/20 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div className="pt-2 border-t border-indigo-200 dark:border-indigo-500/20 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div>
-                  <label className="text-slate-300 font-medium block mb-1">
+                  <label className="text-slate-700 dark:text-slate-300 font-medium block mb-1">
                     Frequência
                   </label>
                   <select
                     value={recurrenceInterval}
                     onChange={(e) => setRecurrenceInterval(e.target.value as any)}
-                    className="w-full px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-indigo-400"
+                    className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-indigo-400"
                   >
                     <option value="mensal">Mensal (Todo mês)</option>
                     <option value="semanal">Semanal</option>
@@ -322,13 +322,13 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
 
                 {!editingTransaction && (
                   <div>
-                    <label className="text-slate-300 font-medium block mb-1">
+                    <label className="text-slate-700 dark:text-slate-300 font-medium block mb-1">
                       Repetir por quantos meses?
                     </label>
                     <select
                       value={repeatMonths}
                       onChange={(e) => setRepeatMonths(Number(e.target.value))}
-                      className="w-full px-2.5 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-indigo-400"
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-indigo-400"
                     >
                       <option value={1}>Apenas neste mês</option>
                       <option value={3}>3 meses (Próximo trimestre)</option>
@@ -345,13 +345,13 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
           {/* Status & Payment Method */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-semibold text-slate-300 block mb-1">
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                 Forma de Pagamento
               </label>
               <select
                 value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-emerald-500 cursor-pointer"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-emerald-500 cursor-pointer"
               >
                 <option value="Pix">Pix</option>
                 <option value="Cartão de Crédito">Cartão de Crédito</option>
@@ -364,13 +364,13 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-slate-300 block mb-1">
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
                 Status da Transação
               </label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as TransactionStatus)}
-                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs focus:outline-none focus:border-emerald-500 cursor-pointer"
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-emerald-500 cursor-pointer"
               >
                 <option value="concluido">Concluído (Liquidado)</option>
                 <option value="pendente">Pendente (Agendado / A pagar)</option>
@@ -380,7 +380,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
 
           {/* Notes */}
           <div>
-            <label className="text-xs font-semibold text-slate-300 block mb-1">
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
               Observações (Opcional)
             </label>
             <input
@@ -388,22 +388,22 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
               placeholder="Ex: Parcela 2/6, comprovante guardado..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+              className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-xs placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-emerald-500"
             />
           </div>
 
           {/* Buttons */}
-          <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-500 shadow-md shadow-emerald-950/50 transition active:scale-95"
+              className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-500 shadow-md shadow-emerald-950/20 dark:shadow-emerald-950/50 transition active:scale-95 cursor-pointer"
             >
               <Check className="w-4 h-4" />
               <span>

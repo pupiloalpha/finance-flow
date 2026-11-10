@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FinanceProvider, useFinance } from './context/FinanceContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { Header } from './components/Header';
 import { KPICards } from './components/KPICards';
 import { FiftyThirtyTwentyCard } from './components/FiftyThirtyTwentyCard';
@@ -12,10 +13,10 @@ import { AIHealthModal } from './components/AIHealthModal';
 import { FileUploadModal } from './components/FileUploadModal';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { FinancialHealthAnalysis, Transaction, TransactionType } from './types';
-import { ShieldCheck, Sparkles, FileSpreadsheet, UploadCloud } from 'lucide-react';
+import { ShieldCheck, FileSpreadsheet } from 'lucide-react';
 
 function Dashboard() {
-  const { analyzeFinancialHealth, isAnalyzingHealth } = useFinance();
+  const { analyzeFinancialHealth, isAnalyzingHealth, transactions } = useFinance();
 
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
@@ -88,51 +89,42 @@ function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-['Plus_Jakarta_Sans']">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col font-['Plus_Jakarta_Sans'] transition-colors duration-200">
       <Header
         onOpenNewTransaction={() => handleOpenNewTransaction()}
         onOpenBudgetModal={handleOpenBulkBudgetModal}
         onOpenHealthModal={handleTriggerAIHealth}
-        onOpenFileUpload={() => setIsFileUploadOpen(true)}
       />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        {/* Welcome / Info Banner with Quick AI & File Upload Triggers */}
-        <div className="relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-r from-emerald-950/30 via-slate-900 to-teal-950/30 p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-lg">
+        {/* Welcome / Info Banner with Monthly Status Badges */}
+        <div className="relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-r from-emerald-50/80 via-white to-teal-50/80 dark:from-emerald-950/30 dark:via-slate-900 dark:to-teal-950/30 p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xs dark:shadow-lg transition-colors">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 shrink-0">
+            <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 shrink-0">
               <FileSpreadsheet className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-white flex items-center gap-2">
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 Planilha Automatizada de Controle Financeiro
-                <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-semibold">
+                <span className="text-[10px] bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-semibold">
                   PWA & Nuvem
                 </span>
               </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Controle inteligente com metodologia 50-30-20, suporte a despesas fixas recorrentes, importação inteligente de extratos via Gemini e diagnóstico de saúde financeira.
+              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                Controle inteligente com metodologia 50-30-20, suporte a despesas fixas recorrentes, importação de extratos e diagnóstico financeiro com Gemini IA.
               </p>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2 shrink-0">
-            <button
-              onClick={handleTriggerAIHealth}
-              disabled={isAnalyzingHealth}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-xs font-bold text-white shadow-md shadow-emerald-950/40 transition active:scale-95"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Diagnóstico com Gemini</span>
-            </button>
-
-            <button
-              onClick={() => setIsFileUploadOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-xs font-semibold text-slate-200 transition"
-            >
-              <UploadCloud className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Importar Extrato</span>
-            </button>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Metodologia 50/30/20 Ativa</span>
+            </div>
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 shadow-xs">
+              <span className="font-bold text-slate-900 dark:text-white">{transactions.length}</span>
+              <span>lançamentos ativos</span>
+            </div>
           </div>
         </div>
 
@@ -145,7 +137,7 @@ function Dashboard() {
         {/* 3. Visual Charts (Comparativo de Despesas & Evolução Mensal) */}
         <ExpenseCharts />
 
-        {/* 4. Detailed Category Tables (Despesas & Receitas with ⚠️ alerts) */}
+        {/* 4. Detailed Category Tables (Despesas & Receitas with alerts) */}
         <CategoryTables
           onQuickAdd={(catName, type) => handleOpenNewTransaction(catName, type)}
           onEditPlanned={handleEditPlanned}
@@ -163,10 +155,10 @@ function Dashboard() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-900 bg-slate-950 py-6 text-center text-xs text-slate-500">
+      <footer className="border-t border-slate-200 dark:border-slate-900 bg-white dark:bg-slate-950 py-6 text-center text-xs text-slate-500 dark:text-slate-400 transition-colors">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-500" />
+            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-500" />
             <span>FinanFlow — Seus dados financeiros protegidos e criptografados</span>
           </div>
           <p>© 2026 Controle Financeiro Pessoal • Integrado ao Firebase & Gemini AI</p>
@@ -210,8 +202,11 @@ function Dashboard() {
 
 export default function App() {
   return (
-    <FinanceProvider>
-      <Dashboard />
-    </FinanceProvider>
+    <ThemeProvider>
+      <FinanceProvider>
+        <Dashboard />
+      </FinanceProvider>
+    </ThemeProvider>
   );
 }
+
