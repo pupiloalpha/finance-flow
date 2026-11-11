@@ -14,7 +14,7 @@ import { FileUploadModal } from './components/FileUploadModal';
 import { ClearDataModal } from './components/ClearDataModal';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { FinancialHealthAnalysis, Transaction, TransactionType } from './types';
-import { ShieldCheck, FileSpreadsheet } from 'lucide-react';
+import { ShieldCheck, FileSpreadsheet, Database } from 'lucide-react';
 
 function Dashboard() {
   const { analyzeFinancialHealth, isAnalyzingHealth, transactions } = useFinance();
@@ -39,6 +39,9 @@ function Dashboard() {
 
   // File Upload modal states
   const [isFileUploadOpen, setIsFileUploadOpen] = useState(false);
+
+  // Data Manager (Clear, Google Drive Backup & Restore) states
+  const [isClearDataModalOpen, setIsClearDataModalOpen] = useState(false);
 
   const handleOpenNewTransaction = (category?: string, type: TransactionType = 'despesa') => {
     setEditingTransaction(null);
@@ -95,6 +98,7 @@ function Dashboard() {
         onOpenNewTransaction={() => handleOpenNewTransaction()}
         onOpenBudgetModal={handleOpenBulkBudgetModal}
         onOpenHealthModal={handleTriggerAIHealth}
+        onOpenClearDataModal={() => setIsClearDataModalOpen(true)}
       />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
@@ -126,6 +130,14 @@ function Dashboard() {
               <span className="font-bold text-slate-900 dark:text-white">{transactions.length}</span>
               <span>lançamentos ativos</span>
             </div>
+            <button
+              onClick={() => setIsClearDataModalOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800 text-xs font-bold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition cursor-pointer shadow-xs active:scale-95"
+              title="Gerenciar dados: Backup no Google Drive, apagar todos os registros ou restaurar"
+            >
+              <Database className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <span>Gerenciador de Dados</span>
+            </button>
           </div>
         </div>
 
@@ -150,6 +162,7 @@ function Dashboard() {
           onEditTransaction={handleEditTransaction}
           onOpenNewTransaction={() => handleOpenNewTransaction()}
           onOpenFileUpload={() => setIsFileUploadOpen(true)}
+          onOpenClearDataModal={() => setIsClearDataModalOpen(true)}
           selectedCategoryFilter={selectedCategoryFilter}
           onClearCategoryFilter={() => setSelectedCategoryFilter(null)}
         />
@@ -198,6 +211,11 @@ function Dashboard() {
       <FileUploadModal
         isOpen={isFileUploadOpen}
         onClose={() => setIsFileUploadOpen(false)}
+      />
+
+      <ClearDataModal
+        isOpen={isClearDataModalOpen}
+        onClose={() => setIsClearDataModalOpen(false)}
       />
 
       <OfflineIndicator />

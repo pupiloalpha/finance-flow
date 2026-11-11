@@ -16,6 +16,7 @@ import {
   Repeat,
   UploadCloud,
   ClipboardPaste,
+  Database,
 } from 'lucide-react';
 
 interface TransactionListProps {
@@ -98,11 +99,11 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           {onOpenClearDataModal && (
             <button
               onClick={onOpenClearDataModal}
-              className="flex items-center gap-1.5 rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-900/50 px-3 py-2 text-xs font-semibold text-rose-700 dark:text-rose-300 transition cursor-pointer shadow-xs active:scale-95"
-              title="Apagar registros do mês ou zerar todos os lançamentos"
+              className="flex items-center gap-1.5 rounded-xl border border-indigo-200 dark:border-indigo-900/50 bg-indigo-50 dark:bg-indigo-950/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 px-3 py-2 text-xs font-semibold text-indigo-700 dark:text-indigo-300 transition cursor-pointer shadow-xs active:scale-95"
+              title="Gerenciador de Registros: Backup no Google Drive, apagar todos os lançamentos ou restaurar"
             >
-              <Trash2 className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-              <span>Apagar Registros</span>
+              <Database className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+              <span>Gerenciar Registros</span>
             </button>
           )}
         </div>

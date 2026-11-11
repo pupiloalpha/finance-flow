@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { User, onAuthStateChanged } from 'firebase/auth';
+import { User, onAuthStateChanged, GoogleAuthProvider } from 'firebase/auth';
 import {
   collection,
   doc,
@@ -15,10 +15,21 @@ import {
   db,
   loginWithGoogle,
   logoutUser,
+  getRedirectResult,
   testConnection,
   handleFirestoreError,
   OperationType,
+  setCachedAccessToken,
+  requestDriveAccessToken,
 } from '../firebase';
+import {
+  AppBackupPayload,
+  DriveBackupFile,
+  uploadBackupToDrive,
+  listBackupsFromDrive,
+  downloadBackupFromDrive,
+  deleteBackupFromDrive,
+} from '../utils/googleDriveBackup';
 import {
   CategoryBudget,
   CategorySummary,
@@ -60,6 +71,9 @@ interface FinanceContextType {
   fiftyThirtyTwenty: FiftyThirtyTwentyStats;
   isCloudSynced: boolean;
   isSyncing: boolean;
+  isLoggingIn: boolean;
+  loginError: string | null;
+  clearLoginError: () => void;
   isAnalyzingHealth: boolean;
   isExtractingFile: boolean;
   login: () => Promise<void>;
@@ -74,6 +88,12 @@ interface FinanceContextType {
   updateMonthlyBudgetPlan: (expenses: number, incomes: number, notes?: string) => Promise<void>;
   resetToSpreadsheetData: () => Promise<void>;
   exportToCSV: () => void;
+  createDriveBackup: () => Promise<DriveBackupFile>;
+  listDriveBackups: () => Promise<DriveBackupFile[]>;
+  restoreFromDriveBackup: (fileId: string) => Promise<number>;
+  deleteDriveBackup: (fileId: string) => Promise<void>;
+  restoreFromJSONPayload: (payload: AppBackupPayload) => Promise<number>;
+  downloadLocalBackupJSON: () => void;
   analyzeFinancialHealth: () => Promise<FinancialHealthAnalysis>;
   extractTransactionsFromFile: (file: File) => Promise<ExtractedTransaction[]>;
 }
@@ -85,6 +105,8 @@ const LOCAL_STORAGE_PREFIX = 'finanflow_v1_';
 export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string>(INITIAL_MONTH);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isCloudSynced, setIsCloudSynced] = useState(false);
@@ -131,6 +153,25 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Test connection on mount
   useEffect(() => {
     testConnection();
+  }, []);
+
+  // Process redirect sign-in result when returning from Google OAuth on mobile / PWA
+  useEffect(() => {
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result?.user) {
+          setUser(result.user);
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          if (credential?.accessToken) {
+            setCachedAccessToken(credential.accessToken);
+          }
+          setIsLoggingIn(false);
+        }
+      })
+      .catch((error) => {
+        console.warn('Redirect sign-in notice:', error);
+        setIsLoggingIn(false);
+      });
   }, []);
 
   // Save to local storage on changes
@@ -411,11 +452,22 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [categoryBudgets, activeTransactions, selectedMonth]);
 
   // Actions
+  const clearLoginError = () => setLoginError(null);
+
   const handleLogin = async () => {
+    setIsLoggingIn(true);
+    setLoginError(null);
     try {
       await loginWithGoogle();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Erro no login:', err);
+      if (err?.code === 'auth/popup-blocked') {
+        setLoginError('O pop-up de login foi bloqueado. Por favor, permita pop-ups no seu navegador ou tente novamente.');
+      } else if (err?.code !== 'auth/popup-closed-by-user') {
+        setLoginError('Não foi possível conectar com o Google no momento. Tente novamente.');
+      }
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
@@ -662,6 +714,105 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     document.body.removeChild(link);
   };
 
+  // Google Drive Backup & Restore Implementation
+  const createDriveBackup = async (): Promise<DriveBackupFile> => {
+    const token = await requestDriveAccessToken();
+    const payload: AppBackupPayload = {
+      version: 1,
+      appName: 'Minhas Contas',
+      createdAt: new Date().toISOString(),
+      userEmail: user?.email || undefined,
+      totalTransactions: transactions.length,
+      transactions,
+      categoryBudgets,
+      monthlyBudgets: {
+        [selectedMonth]: monthlyBudget,
+      },
+    };
+    return await uploadBackupToDrive(token, payload);
+  };
+
+  const listDriveBackups = async (): Promise<DriveBackupFile[]> => {
+    const token = await requestDriveAccessToken();
+    return await listBackupsFromDrive(token);
+  };
+
+  const restoreFromDriveBackup = async (fileId: string): Promise<number> => {
+    const token = await requestDriveAccessToken();
+    const payload = await downloadBackupFromDrive(token, fileId);
+    return await restoreFromJSONPayload(payload);
+  };
+
+  const deleteDriveBackup = async (fileId: string): Promise<void> => {
+    const token = await requestDriveAccessToken();
+    await deleteBackupFromDrive(token, fileId);
+  };
+
+  const restoreFromJSONPayload = async (payload: AppBackupPayload): Promise<number> => {
+    if (!payload || !Array.isArray(payload.transactions)) {
+      throw new Error('Arquivo de backup inválido ou incompatível.');
+    }
+
+    const restoredTx = payload.transactions;
+    setTransactions(restoredTx);
+
+    if (Array.isArray(payload.categoryBudgets) && payload.categoryBudgets.length > 0) {
+      setCategoryBudgets(payload.categoryBudgets);
+    }
+
+    if (payload.monthlyBudgets && payload.monthlyBudgets[selectedMonth]) {
+      setMonthlyBudget(payload.monthlyBudgets[selectedMonth]);
+    }
+
+    // If authenticated, sync restored data into Firestore
+    if (user && restoredTx.length > 0) {
+      try {
+        for (let i = 0; i < restoredTx.length; i += 400) {
+          const chunk = restoredTx.slice(i, i + 400);
+          const batch = writeBatch(db);
+          chunk.forEach((t) => {
+            batch.set(doc(db, 'users', user.uid, 'transactions', t.id), {
+              ...t,
+              userId: user.uid,
+              updatedAt: new Date().toISOString(),
+            });
+          });
+          await batch.commit();
+        }
+      } catch (err) {
+        console.error('Erro ao salvar dados restaurados no Firestore:', err);
+      }
+    }
+
+    return restoredTx.length;
+  };
+
+  const downloadLocalBackupJSON = () => {
+    const payload: AppBackupPayload = {
+      version: 1,
+      appName: 'Minhas Contas',
+      createdAt: new Date().toISOString(),
+      userEmail: user?.email || undefined,
+      totalTransactions: transactions.length,
+      transactions,
+      categoryBudgets,
+      monthlyBudgets: {
+        [selectedMonth]: monthlyBudget,
+      },
+    };
+
+    const jsonStr = JSON.stringify(payload, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `MinhasContas_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   // Gemini AI Financial Health Analysis
   const analyzeFinancialHealth = async (): Promise<FinancialHealthAnalysis> => {
     setIsAnalyzingHealth(true);
@@ -800,6 +951,9 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         fiftyThirtyTwenty,
         isCloudSynced,
         isSyncing,
+        isLoggingIn,
+        loginError,
+        clearLoginError,
         isAnalyzingHealth,
         isExtractingFile,
         login: handleLogin,
@@ -814,6 +968,12 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         updateMonthlyBudgetPlan,
         resetToSpreadsheetData,
         exportToCSV,
+        createDriveBackup,
+        listDriveBackups,
+        restoreFromDriveBackup,
+        deleteDriveBackup,
+        restoreFromJSONPayload,
+        downloadLocalBackupJSON,
         analyzeFinancialHealth,
         extractTransactionsFromFile,
       }}

@@ -221,69 +221,74 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({
   const totalReceitas = selectedItems.filter((t) => t.type === 'receita').reduce((acc, t) => acc + t.amount, 0);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-md p-4 overflow-y-auto">
-      <div className="w-full max-w-3xl rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 shadow-2xl text-slate-800 dark:text-slate-100 my-8 max-h-[92vh] overflow-y-auto transition-colors">
-        
-        {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-600 text-white shadow-md">
-              <ClipboardPaste className="w-5 h-5" />
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 dark:bg-black/80 backdrop-blur-md p-2.5 sm:p-4">
+      <div className="min-h-full flex items-start sm:items-center justify-center py-2 sm:py-6">
+        <div className="relative w-full max-w-3xl rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl text-slate-800 dark:text-slate-100 flex flex-col max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-3rem)] overflow-hidden transition-colors">
+          
+          {/* Header - Always accessible at top */}
+          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800 shrink-0 bg-white dark:bg-slate-900 z-10">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-600 text-white shadow-md shrink-0">
+                <ClipboardPaste className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 flex-wrap">
+                  Importar & Colar Lançamentos
+                  <span className="text-[10px] bg-cyan-500/10 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/30 px-2 py-0.5 rounded-full font-semibold">
+                    Excel • Sheets • Arquivos
+                  </span>
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Cole dados tabulados ou envie extratos em PDF, CSV ou imagens
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                Importar & Colar Lançamentos
-                <span className="text-[10px] bg-cyan-500/10 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/30 px-2 py-0.5 rounded-full font-semibold">
-                  Excel • Sheets • Arquivos
-                </span>
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Cole dados tabulados copiados do computador ou envie extratos em PDF, CSV ou faturas
-              </p>
-            </div>
-          </div>
 
-          <button
-            onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Modal Navigation Tabs (When not in preview mode) */}
-        {extractedList.length === 0 && (
-          <div className="flex border-b border-slate-200 dark:border-slate-800 mt-4">
             <button
-              onClick={() => {
-                setActiveTab('paste');
-                setErrorMsg(null);
-              }}
-              className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition cursor-pointer ${
-                activeTab === 'paste'
-                  ? 'border-cyan-500 text-cyan-700 dark:text-cyan-400 bg-cyan-50/50 dark:bg-cyan-950/20 rounded-t-lg'
-                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
+              onClick={onClose}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer shrink-0 ml-2"
+              aria-label="Fechar"
             >
-              <ClipboardPaste className="w-4 h-4" />
-              <span>Copiar & Colar Planilha (Tabulado)</span>
-            </button>
-            <button
-              onClick={() => {
-                setActiveTab('file');
-                setErrorMsg(null);
-              }}
-              className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition cursor-pointer ${
-                activeTab === 'file'
-                  ? 'border-cyan-500 text-cyan-700 dark:text-cyan-400 bg-cyan-50/50 dark:bg-cyan-950/20 rounded-t-lg'
-                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-            >
-              <UploadCloud className="w-4 h-4" />
-              <span>Enviar Arquivo (PDF, CSV, OFX)</span>
+              <X className="w-5 h-5" />
             </button>
           </div>
-        )}
+
+          {/* Modal Navigation Tabs (When not in preview mode) */}
+          {extractedList.length === 0 && (
+            <div className="flex border-b border-slate-200 dark:border-slate-800 px-5 shrink-0 bg-white dark:bg-slate-900 overflow-x-auto">
+              <button
+                onClick={() => {
+                  setActiveTab('paste');
+                  setErrorMsg(null);
+                }}
+                className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition cursor-pointer whitespace-nowrap ${
+                  activeTab === 'paste'
+                    ? 'border-cyan-500 text-cyan-700 dark:text-cyan-400 bg-cyan-50/50 dark:bg-cyan-950/20 rounded-t-lg'
+                    : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <ClipboardPaste className="w-4 h-4" />
+                <span>Copiar & Colar Planilha (Tabulado)</span>
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab('file');
+                  setErrorMsg(null);
+                }}
+                className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold border-b-2 transition cursor-pointer whitespace-nowrap ${
+                  activeTab === 'file'
+                    ? 'border-cyan-500 text-cyan-700 dark:text-cyan-400 bg-cyan-50/50 dark:bg-cyan-950/20 rounded-t-lg'
+                    : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <UploadCloud className="w-4 h-4" />
+                <span>Enviar Arquivo (PDF, CSV, OFX)</span>
+              </button>
+            </div>
+          )}
+
+          {/* Scrollable Content Area */}
+          <div className="px-5 py-4 overflow-y-auto overscroll-contain flex-1">
 
         {/* Content Area */}
         {extractedList.length === 0 ? (
@@ -702,6 +707,8 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({
           </div>
         )}
 
+          </div>
+        </div>
       </div>
     </div>
   );

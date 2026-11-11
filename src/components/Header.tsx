@@ -15,6 +15,8 @@ import {
   TrendingUp,
   Sparkles,
   Trash2,
+  Database,
+  HardDrive,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -48,6 +50,9 @@ export const Header: React.FC<HeaderProps> = ({
   const {
     user,
     authLoading,
+    isLoggingIn,
+    loginError,
+    clearLoginError,
     login,
     logout,
     selectedMonth,
@@ -184,22 +189,22 @@ export const Header: React.FC<HeaderProps> = ({
               <Download className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
             </button>
 
-            {/* Manage / Clear Data button */}
+            {/* Gerenciador de Registros & Backup (Google Drive, Zerar Tudo, Restaurar) */}
             {onOpenClearDataModal && (
               <button
                 onClick={onOpenClearDataModal}
-                className="flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/60 px-2.5 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition cursor-pointer"
-                title="Gerenciar e apagar registros ou restaurar modelo"
+                className="flex items-center gap-1.5 rounded-xl border border-indigo-500/30 bg-indigo-50/80 dark:bg-indigo-950/40 px-2.5 py-1.5 text-xs font-bold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition cursor-pointer shadow-xs"
+                title="Gerenciador de Registros: Backup no Google Drive, apagar todos os registros e restaurar"
               >
-                <Trash2 className="w-3.5 h-3.5 text-slate-500 hover:text-rose-600 dark:hover:text-rose-400" />
-                <span className="hidden sm:inline">Limpar</span>
+                <Database className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                <span>Dados & Backup</span>
               </button>
             )}
 
             {/* User Auth with Google */}
             {!authLoading && (
               user ? (
-                <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-xl px-2 py-1 transition-colors">
+                <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-1.5 transition-colors">
                   {user.photoURL ? (
                     <img
                       src={user.photoURL}
@@ -211,7 +216,7 @@ export const Header: React.FC<HeaderProps> = ({
                       {(user.displayName || user.email || 'U')[0].toUpperCase()}
                     </div>
                   )}
-                  <span className="text-xs font-medium text-slate-700 dark:text-slate-300 max-w-[80px] truncate hidden xl:inline">
+                  <span className="text-xs font-medium text-slate-700 dark:text-slate-300 max-w-[80px] truncate hidden sm:inline">
                     {user.displayName?.split(' ')[0] || 'Usuário'}
                   </span>
                   <button
@@ -225,11 +230,16 @@ export const Header: React.FC<HeaderProps> = ({
               ) : (
                 <button
                   onClick={login}
-                  className="flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/80 px-2.5 py-1.5 text-xs font-medium text-slate-800 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition cursor-pointer"
-                  title="Entrar com o Google para salvar no Firebase"
+                  disabled={isLoggingIn}
+                  className="flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition cursor-pointer disabled:opacity-60 shadow-xs"
+                  title="Entrar com o Google para salvar e sincronizar em nuvem"
                 >
-                  <LogIn className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                  <span className="hidden sm:inline">Entrar</span>
+                  {isLoggingIn ? (
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-600 dark:text-emerald-400" />
+                  ) : (
+                    <LogIn className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  )}
+                  <span>{isLoggingIn ? 'Conectando...' : 'Entrar'}</span>
                 </button>
               )
             )}
@@ -247,6 +257,19 @@ export const Header: React.FC<HeaderProps> = ({
 
           </div>
         </div>
+
+        {/* Login error notification if any */}
+        {loginError && (
+          <div className="mt-2.5 p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/50 text-amber-800 dark:text-amber-200 text-xs flex items-center justify-between gap-2 animate-in fade-in">
+            <span>{loginError}</span>
+            <button
+              onClick={clearLoginError}
+              className="text-amber-700 dark:text-amber-300 font-bold hover:underline cursor-pointer shrink-0 text-[11px]"
+            >
+              Fechar ✕
+            </button>
+          </div>
+        )}
       </div>
     </header>
   );
