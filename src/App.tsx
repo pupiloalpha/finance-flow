@@ -11,6 +11,7 @@ import { TransactionModal } from './components/TransactionModal';
 import { BudgetModal } from './components/BudgetModal';
 import { AIHealthModal } from './components/AIHealthModal';
 import { FileUploadModal } from './components/FileUploadModal';
+import { ClearDataModal } from './components/ClearDataModal';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { FinancialHealthAnalysis, Transaction, TransactionType } from './types';
 import { ShieldCheck, FileSpreadsheet } from 'lucide-react';

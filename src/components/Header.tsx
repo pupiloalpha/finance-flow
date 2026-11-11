@@ -14,12 +14,14 @@ import {
   Sliders,
   TrendingUp,
   Sparkles,
+  Trash2,
 } from 'lucide-react';
 
 interface HeaderProps {
   onOpenNewTransaction: () => void;
   onOpenBudgetModal: () => void;
   onOpenHealthModal: () => void;
+  onOpenClearDataModal?: () => void;
 }
 
 const MONTH_NAMES_PT: Record<string, string> = {
@@ -41,6 +43,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenNewTransaction,
   onOpenBudgetModal,
   onOpenHealthModal,
+  onOpenClearDataModal,
 }) => {
   const {
     user,
@@ -181,18 +184,17 @@ export const Header: React.FC<HeaderProps> = ({
               <Download className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
             </button>
 
-            {/* Reset to initial sheet */}
-            <button
-              onClick={() => {
-                if (window.confirm('Deseja restaurar os dados originais da planilha de Novembro de 2026?')) {
-                  resetToSpreadsheetData();
-                }
-              }}
-              className="p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 transition cursor-pointer"
-              title="Restaurar dados originais da planilha modelo"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-            </button>
+            {/* Manage / Clear Data button */}
+            {onOpenClearDataModal && (
+              <button
+                onClick={onOpenClearDataModal}
+                className="flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/60 px-2.5 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition cursor-pointer"
+                title="Gerenciar e apagar registros ou restaurar modelo"
+              >
+                <Trash2 className="w-3.5 h-3.5 text-slate-500 hover:text-rose-600 dark:hover:text-rose-400" />
+                <span className="hidden sm:inline">Limpar</span>
+              </button>
+            )}
 
             {/* User Auth with Google */}
             {!authLoading && (

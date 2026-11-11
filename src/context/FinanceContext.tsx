@@ -8,6 +8,7 @@ import {
   onSnapshot,
   query,
   where,
+  writeBatch,
 } from 'firebase/firestore';
 import {
   auth,
@@ -67,6 +68,8 @@ interface FinanceContextType {
   addTransactionsBatch: (items: Omit<Transaction, 'id' | 'userId'>[]) => Promise<void>;
   updateTransaction: (transaction: Transaction) => Promise<void>;
   deleteTransaction: (id: string) => Promise<void>;
+  clearMonthTransactions: (month?: string) => Promise<void>;
+  clearAllTransactions: () => Promise<void>;
   updateCategoryPlanned: (categoryId: string, newPlanned: number) => Promise<void>;
   updateMonthlyBudgetPlan: (expenses: number, incomes: number, notes?: string) => Promise<void>;
   resetToSpreadsheetData: () => Promise<void>;
@@ -534,6 +537,47 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
+  const clearMonthTransactions = async (month?: string) => {
+    const targetMonth = month || selectedMonth;
+    const toDelete = transactions.filter((t) => t.month === targetMonth);
+    setTransactions((prev) => prev.filter((t) => t.month !== targetMonth));
+
+    if (user && toDelete.length > 0) {
+      try {
+        for (let i = 0; i < toDelete.length; i += 400) {
+          const chunk = toDelete.slice(i, i + 400);
+          const batch = writeBatch(db);
+          chunk.forEach((t) => {
+            batch.delete(doc(db, 'users', user.uid, 'transactions', t.id));
+          });
+          await batch.commit();
+        }
+      } catch (err) {
+        console.error('Erro ao excluir transações do mês no Firestore:', err);
+      }
+    }
+  };
+
+  const clearAllTransactions = async () => {
+    const all = [...transactions];
+    setTransactions([]);
+
+    if (user && all.length > 0) {
+      try {
+        for (let i = 0; i < all.length; i += 400) {
+          const chunk = all.slice(i, i + 400);
+          const batch = writeBatch(db);
+          chunk.forEach((t) => {
+            batch.delete(doc(db, 'users', user.uid, 'transactions', t.id));
+          });
+          await batch.commit();
+        }
+      } catch (err) {
+        console.error('Erro ao excluir todas as transações no Firestore:', err);
+      }
+    }
+  };
+
   const updateCategoryPlanned = async (categoryId: string, newPlanned: number) => {
     setCategoryBudgets((prev) =>
       prev.map((c) => (c.id === categoryId ? { ...c, plannedAmount: newPlanned } : c))
@@ -764,6 +808,8 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
         addTransactionsBatch,
         updateTransaction,
         deleteTransaction,
+        clearMonthTransactions,
+        clearAllTransactions,
         updateCategoryPlanned,
         updateMonthlyBudgetPlan,
         resetToSpreadsheetData,

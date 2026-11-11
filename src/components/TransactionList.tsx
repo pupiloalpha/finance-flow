@@ -22,6 +22,7 @@ interface TransactionListProps {
   onEditTransaction: (tx: Transaction) => void;
   onOpenNewTransaction: () => void;
   onOpenFileUpload?: () => void;
+  onOpenClearDataModal?: () => void;
   selectedCategoryFilter: string | null;
   onClearCategoryFilter: () => void;
 }
@@ -30,6 +31,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   onEditTransaction,
   onOpenNewTransaction,
   onOpenFileUpload,
+  onOpenClearDataModal,
   selectedCategoryFilter,
   onClearCategoryFilter,
 }) => {
@@ -90,6 +92,17 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             >
               <ClipboardPaste className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
               <span>Importar ou Colar Planilha</span>
+            </button>
+          )}
+
+          {onOpenClearDataModal && (
+            <button
+              onClick={onOpenClearDataModal}
+              className="flex items-center gap-1.5 rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-900/50 px-3 py-2 text-xs font-semibold text-rose-700 dark:text-rose-300 transition cursor-pointer shadow-xs active:scale-95"
+              title="Apagar registros do mês ou zerar todos os lançamentos"
+            >
+              <Trash2 className="w-4 h-4 text-rose-600 dark:text-rose-400" />
+              <span>Apagar Registros</span>
             </button>
           )}
         </div>
